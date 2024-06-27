@@ -62,12 +62,32 @@ Task getTask(TaskQueue *queue) {
 
 TaskQueue *initTaskQueue(int capacity) {
   TaskQueue *queue =
-      (TaskQueue *)malloc(sizeof(TaskQueue) + sizeof(int[capacity]));
+      (TaskQueue *)malloc(sizeof(TaskQueue) + sizeof(Task[capacity]));
   queue->capacity = capacity;
   queue->putIndex = queue->getIndex = queue->length = 0;
-  pthread_mutex_init(&queue->lockQueue, NULL);
-  pthread_cond_init(&queue->condNotFull, NULL);
-  pthread_cond_init(&queue->condNotEmpty, NULL);
+  for (int i = 0; i < capacity; i++)
+    queue->TaskArr[i] = -1;
+
+  if (pthread_mutex_init(&queue->lockQueue, NULL) != 0) {
+    perror("Mutex init failed");
+    free(queue);
+    return NULL;
+  }
+
+  if (pthread_cond_init(&queue->condNotFull, NULL) != 0) {
+    perror("Condition init failed");
+    pthread_mutex_destroy(&queue->lockQueue);
+    free(queue);
+    return NULL;
+  }
+
+  if (pthread_cond_init(&queue->condNotEmpty, NULL) != 0) {
+    perror("Condition init failed");
+    pthread_cond_destroy(&queue->condNotFull);
+    pthread_mutex_destroy(&queue->lockQueue);
+    free(queue);
+    return NULL;
+  }
   return queue;
 }
 
