@@ -245,7 +245,12 @@ int main(int argc, char *argv[]) {
   memset(&server_addr, 0, sizeof(server_addr));
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(port);
-  server_addr.sin_addr.s_addr = inet_addr(argv[1]); // Use provided IP address
+  if (strcmp(argv[1], "localhost") == 0) {
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+  } else if (inet_pton(AF_INET, argv[1], &server_addr.sin_addr) <= 0) {
+    perror("inet_pton failed");
+    exit(1);
+  }
   if (connect(client_fd, (struct sockaddr *)&server_addr,
               sizeof(server_addr)) == -1) {
     perror("connect");
