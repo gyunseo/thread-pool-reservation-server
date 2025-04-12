@@ -5,7 +5,7 @@
 ## Prerequities
 
 ```zsh
-sudo apt install libargon2-dev
+sudo apt-get -y install libargon2-dev libreadline-dev
 ```
 
 ## 0. Project Hierarchy
@@ -41,19 +41,19 @@ make
 ## 2. How to Run
 
 ```zsh
-./pa3_server 1398
+./pa3_server 11398
 ```
 
 On another terminal,
 
 ```zsh
-./pa3_client localhost 1398
+./pa3_client localhost 11398
 ```
 
 or
 
 ```zsh
-./pa3_client localhost 1398 [filename]
+./pa3_client localhost 11398 [filename]
 ```
 
 ## 3. Implementation
@@ -64,6 +64,8 @@ or
 - Consumer는 Task Queue에서 Task를 가져와서 처리한다. Consumer는 최대 Thread 개수만큼 동시에 동작한다.
 - Task는 Client로부터 받은 데이터를 처리하는 것을 의미한다. (여기서는 client로부터 연결 및 예약 시스템 쿼리를 받아 처리한다.)
 
+
+
 ### 3.2. Client
 
 - Client는 Server에 연결하여 데이터를 보낸다.
@@ -72,6 +74,16 @@ or
 - Client는 Server로부터 받은 데이터를 출력한다. (Response Code에 따라 Success 메시지와 Error 메시지를 출력한다.)
 
 ## 4. Test
+
+| Action ID | Name              | On success                               | On failure                                |
+|-----------|-------------------|------------------------------------------|-------------------------------------------|
+| 0         | Termination        | Connection terminated.                   | Failed to disconnect as ERROR_MSG.        |
+| 1         | Log in             | Logged in successfully.                  | Failed to log in as ERROR_MSG.            |
+| 2         | Book               | Booked seat SEAT_NUMBER.                 | Failed to book as ERROR_MSG.              |
+| 3         | Confirm booking    | "Booked the seats seats1, seats2, etc.." | Failed to confirm booking as ERROR_MSG.   |
+| 4         | Cancel booking     | Canceled seat SEAT_NUMBER.              | Failed to cancel booking as ERROR_MSG.    |
+| 5         | Log out            | Logged out successfully.                 | Failed to log out as ERROR_MSG.           |
+| <Other>   | Unknown action     | -                                        | Action <Other> is unknown.                |
 
 `test.txt`:
 
@@ -97,13 +109,13 @@ or
 On sserver terminal,
 
 ```zsh
-./pa3_server 1398
+./pa3_server 11398
 ```
 
 On another terminal(client terminal),
 
 ```zsh
-./pa3_client 127.0.0.1 1398 test.txt
+./pa3_client 127.0.0.1 11398 test.txt
 ```
 
 ```zsh
@@ -125,3 +137,5 @@ Logged out successfully.
 Failed to login as password is incorrect.
 Connection terminated.
 ```
+
+`./load_test.sh`를 실행하여 최대 256명의 유저를 핸들링하는 시나리오를 재현할 수 있다.  
